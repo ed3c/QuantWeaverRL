@@ -1,0 +1,41 @@
+name: P0 replay
+
+on:
+  pull_request:
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'crates/replay/**'
+      - 'scripts/verify_replay.py'
+      - '.github/workflows/p0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.93.0 --profile minimal --component rustfmt
+      - name: Verify deterministic synthetic replay
+        env:
+          QWR_EVIDENCE_DIR: ${{ runner.temp }}/p0-replay-evidence
+        run: |
+          cargo fmt --all -- --check
+          cargo test --locked -p quantweaver-replay
+          python3 scripts/verify_replay.py
+      - name: Retain replay evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p0-replay-${{ github.sha }}
+          path: ${{ runner.temp }}/p0-replay-evidence
+          retention-days: 14
+          if-no-files-found: warn
