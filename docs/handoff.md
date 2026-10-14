@@ -1,57 +1,50 @@
-# QuantWeaverRL — zero-context engineering handoff
+# QuantWeaverRL — zero-context Soodles handoff
 
-Generated: 2026-10-12. Purpose: resume the **existing** QuantWeaverRL project and implement its staged paper-trading/agent-RL infrastructure. This is a snapshot, not execution evidence or a replacement for current source.
+Updated: **2026-10-14**. This compact records the current task intent and source locations; it is **not** evidence that a runtime, test or provider action succeeded. Always refresh the GitHub HEAD and owner next before continuing. It follows Soodles `.agents/skills/handoff/SKILL.md`; do not copy completed specs into this handoff.
 
-## Exact continuation
+## Where to resume
 
-- Repository: https://github.com/ed3c/QuantWeaverRL
-- Existing PR: https://github.com/ed3c/QuantWeaverRL/pull/1
-- PR branch: `docs/agentic-phased-runtime-contract`
-- Original reviewed head before this handoff: `d80c59a8878a25a683cbf868c2b18e5772ef29f3`. **Refresh HEAD before every write/merge.**
-- Existing documents: `AGENTS.md`, `docs/architecture.md`, `docs/phases.md`. Read them at the actual selected ref. Do not duplicate their specifications here.
-- Soodles: https://github.com/ed3c/soodles (private, requires connected GitHub authorization). Read its current `AGENTS.md`, `contracts/system-v1.md`, and selected skills before operating its workflow.
+- **Target repository**: https://github.com/ed3c/QuantWeaverRL
+- **Current documentation branch for this handoff**: `docs/rust-agentrl-runtime-and-handoff` (refresh state before any action).
+- **Previous merged docs PR**: https://github.com/ed3c/QuantWeaverRL/pull/1, merged in main commit `7bd63d599c5fd619ac045806602b694405c2d632`.
+- **Selected instructions/specs**: [AGENTS.md](../AGENTS.md), [architecture](architecture.md), [P0–P8 phases](phases.md), [domain P-class/CLI states](contracts/pclass-cli-domain-state-machines.md), [RL lakehouse](data-lake.md).
+- **Original engineering owner**: https://github.com/ed3c/soodles. Refresh its `AGENTS.md`, `contracts/system-v1.md`, selected skills and owner receipt. Do **not** re-create its Issue/PR, manager, identity or admission state machines inside QuantWeaverRL.
 
-## User outcome and constraints
+## The objective
 
-Implement, **in phases P0–P8**, a commercially usable (code/data/model/trace rights verified separately), reproducible, paper-only end-to-end Agentic Quant Trading PoC demonstrating backend high concurrency, AI Engineering, Agent Infrastructure, Karotte RL environment and bounded Soodles RSI/harness hill climb. Workloads include synthetic market replay, exchange public-feed normalization, cross-exchange spot arbitrage, funding/basis research, deterministic risk/order simulation, fault recovery, Qlib/RD-Agent(Q) experiments, Jev/DeepSeek/Qwen Decision comparisons and Colab training. Do not promise profit or use real funds.
+Build a **paper-only**, reproducible, commercially permissioned (rights checked separately for code, data, model, traces) financial Agentic RL platform. Prove distributed-backend *principles* locally before claiming distributed deployment: executable correctness, bounded concurrency, durable state, high-quality point-in-time data, financial signal research, multi-agent LLM herding stress tests, robust RL environments and independently verified harness improvement.
 
-Hardware: MacBook M1 Pro 16 GB; Google Colab 200 compute units/month, disposable GPU runtime. Local Mac owns development, limited services, replay and evidence. Colab owns optional training/evals and must persist artifacts externally. No 24/7 Colab server or assumed Mac multi-node HA.
+Current user's hardware: MacBook M1 Pro 16 GB + Colab 200 compute units/month. Mac runs synthetic replay, Rust backend and small Python agent environments; Colab is optional disposable SFT / verified-compatible RL training. Do not start a persistent cloud server or treat 200 CU as guaranteed GPU hours.
 
-## Actual state at handoff
+## Decisions now represented in documents
 
-- PR #1 contains **documents only**, not a working trading runtime.
-- `AGENTS.md` describes Soodles ownership, Brain A/B challenge, independent Test Manager/Schema Manager readback, bounded `prompt_delta`, seven-decision P-class bound, unknown-write preservation and paper-only controls.
-- `docs/architecture.md` defines proposed lanes and state/data contracts.
-- `docs/phases.md` defines staged acceptance P0 through P8.
-- No Mac runtime execution, Colab training, independent Soodles native behavior verification, CI acceptance, or deployed service has been observed. Treat these as `NOT_RUN` until fresh evidence exists.
-- At last read, PR #1 was Draft and open, with zero GitHub check runs on its then-current head. Refresh PR state; never infer checks from this snapshot.
+**Backend:** Rust Tokio + Axum/Tower + account-scoped paper execution; NATS JetStream / PostgreSQL SQLx only after the minimal caller demonstrates need. Operational ledger and exact risk state never belong to DuckDB. Data-lake baseline is Parquet + DuckDB, optionally DuckLake snapshots later. P0 Rust Cargo + Python uv; keep one canonical financial oracle.
 
-## First actions for next Session
+**Markets:** Public Binance and Hyperliquid, Taiwan equities via TWSE/MOPS; Cathay Securities remains a disabled, unverified brokerage API seam. Optional OKX/Bybit Demo read/contract tests. Separate per-market paper arena tracks; same capital, timestamps and fee/risk controls for compared agents. No live orders, real funds, withdrawal keys or money.
 
-1. Fetch current `main`, open PRs, exact HEAD, saved files, CI/check runs, Soodles source and owner continuations. Reconcile any changes since this handoff. Do not create duplicate issues/PRs/schedulers.
-2. Select the original Soodles owner route and run its required scoped P-class behavior feedback for `AGENTS.md` if not already covered by valid evidence. Use its `review-writing` and Test/Schema Manager paths. Keep missing checks `NOT_RUN`, do not substitute a prose review for native behavior.
-3. Begin P0 with smallest runnable vertical slice: synthetic redistributable market events, stable IDs and hashes, license/provenance manifest, deterministic oracle and CI. Follow original admitted Issue atom and returned continuation.
-4. P1 before throughput: account-scoped risk owner, exact decimal/integer accounting, paper exchange, idempotent order ID, execution receipts, duplicate delivery, ACK loss, partial fills, cancel/fill race, crash/restart, `UNKNOWN_WRITE` reconciliation.
-5. P2 then add bounded FastAPI/NATS JetStream/PostgreSQL and fixed-load tests (100/500/1000 RPS targets, **not measured claims**), telemetry, overload control and DB contention evidence.
-6. Only then P3 public exchange feeds and isolated demo/testnet contract adapters; P4 Qlib/RD-Agent(Q) alpha baselines; P5 Karotte isolated episodes; P6 Colab Qwen SFT vs Rules/Jev/DeepSeek and justified RL; P7 Soodles causal prompt-delta hill climb; P8 real second-node scaling if required.
+**Research:** Memory/HBM/DRAM supply-chain point-in-time graph and disclosure surprise; rank IC, event-study CAR, proper probability scores, conditional herding correlation, portfolio concentration, impact and net risk-adjusted returns. No unproved assertion that same-direction real trades were caused by LLMs.
 
-## Brain A / Brain B / prompt delta contract
+**Agent RL:** AgentEnv vs Karotte *alternate adapters* to the same domain oracle and hidden grader. OpenEnv / NeMo Gym are interoperability and training-contract references. Use Qlib/RD-Agent(Q) research, Rules vs optional Jev/DeepSeek/Qwen baseline; Colab Unsloth SFT first. Claim RL only with trainer-appropriate token/logprob/mask provenance and actual weight updates plus held-out gain. MLX on Mac is an optional compatible inference backend, not NVIDIA RL.
 
-Brain A proposes one causal change supported by observed failure. Brain B independently seeks a counterexample using frozen requirements and a discriminating control. Test Manager chooses scoped tests; independent observer measures baseline/treatment on identical inputs; Schema Manager returns next. Do not run unbounded debate or silently accept a model self-judge. If no demonstrated prompt defect, do not change prompt. For each delta preserve failure reference, baseline, treatment, observer, cost, correctness hard gates, outcome and authoritative receipt. Use Soodles canonical workflow decision accounting; per P-class state machine no more than seven actual Session choices/guesses.
+**Soodles:** Brain A proposes one observed causal atom; Brain B challenges with an independent counterexample. Test Manager chooses scoped controls, independent observer checks actual behavior, Schema Manager returns selected next. Only verified defects justify `prompt_delta`. A single P-class machine permits at most seven actual Session choices/guesses, counted using Soodles' calculator, not a new one.
 
-## Hard gates and legal rights
+## State at this handoff
 
-- No live orders, withdrawals, signing keys or money; no LLM/RL bypass of deterministic risk gate.
-- Missing ACK is not a failed external write. Read back by stable client order ID before any retry.
-- A simulated fill is not an exchange-confirmed fill. Quoted spread is not realized alpha.
-- Check **code**, **market data**, **model weights**, and **traces** licenses independently. Synthetic fixtures and self-produced redacted traces are preferred.
-- No production throughput/HA/alpha claim without reproducible workload, source SHA, scenario/data hash, hardware, metrics, independent observer and receipts.
-- Use accepted Soodles owner continuation for writes/merges; no invented authorization, provider truth or native evidence.
+During this task, current `main` was read as documentation-only; it had no executable Rust / Python CLI and no open PR before this documentation branch. This branch changes P-class guidance, domain state-machine *specification*, staged architecture, data ownership and this compact. **None of the proposed domain CLI transitions is implemented by a real caller.** The source-level prose may be reviewed, but no fresh Soodles native Agent behavior, CI, Mac hardware or Colab evaluation was observed here. Keep these at `NOT_RUN` or `UNKNOWN` until verified.
 
-## Suggested skills for the next agent
+## Immediate next work (do not re-plan P0–P8)
 
-Use the Skill tool on the *installed, current* copies of: `handoff` for the next compact; Soodles `issue-atom` for admitted execution; `review-writing` for engineering P-class prose; `test-manager` for scoped tests; `verify-soodles` / applicable evals skill for behavior verification; `provider-readback` for external effect reconciliation; Noodle `poteto-mode` when its selected owner calls it. For outer-loop architecture checks use `ponytail` / `ponytail-review` and `waza-check` only when evidence warrants them. Resolve actual skill availability and selected ref; names alone do not prove installation or authorization.
+1. Fresh-read latest branch, main, open PRs, commits, checks, files and Soodles returned owner continuation. Reconcile the documentation PR first; if accepted, retain the verified main readback.
+2. Use Soodles review-writing on saved P-class AGENTS and domain CLI contract (STE reference and source fidelity). Select **fresh consumer behavior** eval only if required by Soodles, then consume Schema Manager feedback. Do not call a prose review an Agent behavior PASS.
+3. Start **P0** runnable vertical slice in the current selected Issue atom: Rust Cargo workspace, Python uv only where called, deterministic synthetic books/trades, time/rights schema, exact-money types, simple paper oracle and focused CI.
+4. Implement **P1** account risk/reservation, paper order lifecycle, stable IDs and unknown-write/readback controls. Require duplicate, stale-book, ACK-loss, concurrent-account and partial-fill negative tests before optimizing throughput.
+5. Implement **P2** bounded Rust admission API, measured concurrency, NATS/PostgreSQL only with concrete durable callers; record completed work, p99, queue lag, RSS, DB waits, overload and cost. Later phases P3–P8 are specified in [phases](phases.md); never declare them complete from documents.
+6. Update the existing Soodles owner with source-bound accepted/rejected/inconclusive observations and exact continuation. Do not create duplicate scheduler or handcraft a Noodle admission.
 
-## Definition of completion
+## Suggested skills
 
-Each phase must have source-bound `PASS / FAIL / INCONCLUSIVE / NOT_RUN`, independent acceptance evidence and owner next/terminal receipt. P0–P8 are future work until measured. An accepted PR containing these documents is not a completed end-to-end PoC.
+Invoke the Skill tool for the selected **current** versions of `handoff`, Soodles `review-writing`, `issue-atom`, `test-manager`, `verify-soodles`/appropriate evals skill, `provider-readback`, and the original Noodle `poteto-mode` where admission selects it. Outer-loop `ponytail-review` and `waza-check` only for source-grounded design/review questions. Skill names are hints, not proof of installation.
+
+## Completion and safety
+
+Every phase needs authoritative `PASS | FAIL | INCONCLUSIVE | NOT_RUN` with source/ref, scenario and dataset hashes, selected controls, independent observation and effect receipt. Missing evidence is not a failure or a PASS. If a write is uncertain, the *original effect owner* performs fresh readback before another effect. Any handoff or documentation merge does not establish runnable trading/RL infrastructure.
