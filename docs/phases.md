@@ -2,21 +2,21 @@
 
 Each phase is a separate, bounded engineering outcome. **Do not infer completion from this plan.** Source/owners are pinned by the admitted work item. Tests are selected by Soodles Test Manager; avoid full-suite runs without scope.
 
-| Phase | Minimum runnable delivery | Acceptance evidence | Explicit non-goal |
-|---|---|---|---|
-| P0 License and reproducible baseline | Python project, deterministic synthetic L2/trade fixtures, config, CI unit test, provenance matrix, stable hashes | Clean bootstrap; same seed yields same event sequence; 4-asset license manifest | Broker credentials/live trading |
-| P1 Paper trading correctness | Market replay -> signal -> per-account risk -> paper matching -> ledger/receipt + reconciliation | Duplicate intent, ACK loss, partial fill, cancel/fill race, kill/restart and unknown-write controls all pass | Profitable strategy |
-| P2 Async backend concurrency | FastAPI admission, bounded NATS JetStream workers, PostgreSQL transaction/outbox, OTel, k6/Locust | Fixed load 100/500/1000 RPS; p99/lag/RSS/error and per-account invariants captured; overload is bounded; baseline/treatment compared | Multi-node HA claim |
-| P3 Public market data and exchange adapters | Binance, OKX, Bybit read-only feed; book sequence recovery; isolated demo/testnet order adapter interfaces | Gaps/stale books rejected; API contract tests and stable paper order IDs; exchange data rights reviewed | Live wallet/funds |
-| P4 Quant research and alpha verification | Qlib deterministic baseline; optional RD-Agent(Q) proposals; spot/spot and basis/funding paper models | Walk-forward, fee/latency/slippage/inventory-aware executed P&L vs naïve baselines; blind holdout, stress tests; avoid look-ahead | Guaranteed return |
-| P5 Agent eval environment | Karotte isolated scenarios and hidden graders for recover/retry/reconcile/stop | Reproducible transcripts, anti-grader tampering, held-out failure suites, no trading gate violations | Karotte training weights |
-| P6 Decision models and RL | Rules vs Jev/DeepSeek (API optional) vs Qwen3.5 Decision SFT on Colab; optional compatible RL trainer | Same held-out scenarios, accuracy/F1/ECE/Brier, safety, latency, cost/valid decision, checkpoint/provenance; show incremental RL gain or reject | Assuming hosted/API inputs freely redistributable |
-| P7 Soodles RSI harness hill climb | Soodles-selected Issue atom, Brain A/B challenge, independent Test/Schema readback, scoped prompt_delta | Fixed baseline/treatment, fewer actual decisions/rework/cost with no lost hard gate; original owner terminal receipt and replay | Self-reported recursive improvement |
-| P8 Distributed reference | Second real node, then K3s/Temporal/Ray/Flink only if bottleneck demands | Baseline on matched workload, horizontal scaling efficiency, partition/recovery, costs, no correctness regression | Claiming Mac/Colab is production cluster |
+| Phase | Smallest working deliverable | Required independent evidence | Deferred until observed need |
+| --- | --- | --- | --- |
+| **P0 Provenance & deterministic baseline** | Rust Cargo workspace + Python uv workspace; integer/Decimal domain types; self-generated L2/events; input-time and license manifest; CI for selected tests | Same seed gives same event/receipt hash, fixed schemas, no secrets, all 4 rights categories recorded | Kubernetes, GPU Trainer, second API framework |
+| **P1 Trading correctness** | Rust market-book validation, account-scoped risk writer, deterministic paper exchange, receipts and readback | ACK-loss after accepted order, idempotent duplicate delivery/fills, partial two-leg arbitrage, cancel/fill race, concurrent reserve, crash/replay | Real orders, broker credentials, profitability claim |
+| **P2 Measured high-concurrency backend** | Rust Tokio + Axum/Tower; add NATS JetStream + PostgreSQL/SQLx and outbox only when callers/observations justify; OTel | 100/500/1000 incoming RPS workload, **completed** work/sec, p50/p95/p99, queue lag, DB saturation, overload/rejection, correctness unchanged | Default microservice mesh, 50K sustained RPS claims |
+| **P3 Three-market adapters and arena** | Binance & Hyperliquid public read-only data, TWSE/MOPS disclosures, disabled Cathay brokerage seam; optional OKX/Bybit and demo contracts | Sequence/freshness/refusal tests, exchange-specific calendars, point-in-time as-of cutoff, provenance and fair paper-execution comparisons | Live funding, actual exchange orders, nonexistent Cathay sandbox |
+| **P4 Quant + memory supply-chain alpha** | Qlib/RD-Agent(Q) optional research, time-valid HBM/DRAM supply-chain graph and economic surprise, herding/price impact arena | Rank IC, CAR, Brier/ECE, matched homogeneous/diverse LLM controls, net executable backtest after full costs, CVaR and blind walk-forward | Claiming crowd behavior proves real-world LLM causation or stable profits |
+| **P5 NeoLab RL Environment** | One Rust Financial Oracle; adapter PoCs for **AgentEnv vs Karotte** and portable OpenEnv/NeMo Gym interface only where needed | Same seed/state/outcome under adapters, hidden grader isolation, reward tampering/egress/OOM controls, completed valid episodes/sec, canonical traces | Running multiple sandbox frameworks by default |
+| **P6 Model / RL training** | Rules + Jev/DeepSeek API baselines, Qwen3.5 Decision SFT/Calibration in Colab, versioned weights and manifests; RL only with compatible model/token trainer | Same hidden holdout, F1/Accuracy/ECE/Brier, logprob/token-mask integrity where required, safety, cost per valid decision, learning gain beyond SFT | Calling SFT “RL”, assuming MLX or hosted API supports online gradients |
+| **P7 Soodles RSI harness hill climb** | Use *existing* Session/Thinking Route/Noodle/Test/Schema owner; single causal atom; fixed Brain A/B controls; scoped prompt_delta and Golden Replay | Frozen baseline/treatment, actual Session decisions (canonical <=7 P-class), no correctness regression, independent owner/consumer readback | Parallel Soodles clone, self-reported RSI gain |
+| **P8 Distributed reference** | Add a second real node; K3s, Ray, Temporal, Kafka/Flink, NeMo RL/VeRL or ClickHouse only for evidenced bottlenecks | Matched load, scaling efficiency, network-partition/worker failover, telemetry, costs, stable domain invariants | Claiming Mac/Colab is high-availability production deployment |
 
 ## P0 → P1 prerequisite chain
 
-- Begin with publicly redistributable synthetic data and own traces; do not copy licensed market feeds to published fixtures.
+- Begin with self-generated synthetic data and own redacted traces. Verify dataset publication rights; never copy restricted Binance, Hyperliquid or exchange feeds into public fixtures.
 - Implement one stable `event_id`, `client_order_id`, `account_id`, and exact quantity/price representation.
 - Confirm the deterministic Oracle before Agent or RL policy controls the action.
 - Run fault controls before concurrency optimization. Persist owner receipts before state transitions are reported complete.
@@ -29,9 +29,9 @@ A successful request is a durably accepted or explicitly rejected action with a 
 
 Compare spot cross-exchange, spot/perpetual basis and inventory rebalancing on fixed executable depth/time-aligned quotes. Include delayed second-leg prices, maker/taker schedules, funding, transfer/rebalance cost, borrow/margin risk and non-fill. Track opportunity frequency, spread lifetime, realized net P&L, drawdown, CVaR, turnover and capacity. Synthetic success is correctness evidence, not forward profitability evidence.
 
-## P5/P6 RL validity
+## P5/P6 NeoLab and RL validity
 
-Reward must be based on state oracle, not just a model grader. Penalize duplicate effects and safety violations as hard failures. Keep training, calibration and blind test splits disjoint by scenario family and market time; evaluate out-of-distribution faults. SFT must precede a justified RL experiment; if rules already solve the problem, keep rules. Never let training output automatically update an active policy.
+One Rust financial oracle must own order/ledger/reward truth; AgentEnv and Karotte are alternate environment adapters, not parallel oracles. Reward must be based on state oracle, not just a model grader. Penalize duplicate effects and safety violations as hard failures. Keep training, calibration and blind test splits disjoint by scenario family and market time; evaluate out-of-distribution faults. SFT is the initial budget baseline, not a claim that online RL training occurred. Before policy-gradient/GRPO, validate original token IDs, logprobs, masks, policy version and trainer compatibility. If rules already solve the problem, keep rules. Never let training output automatically update an active policy.
 
 ## P7 two-brain decision accounting
 
@@ -39,7 +39,11 @@ Brain A proposes the smallest observed causal atom. Brain B receives a clean fro
 
 ## Resource budgets
 
-MacBook M1 Pro 16 GB: keep only required services running. Benchmark memory and swap and do not co-host full LLM training. Colab 200 CU/month: initial planning envelope 40 CU baseline, 80 CU candidate SFT, 40 CU eval/rollouts, 20 CU ablation, 20 CU reserve; **planning only**, update with observed CU/hour. Colab is disposable, not a persistent daemon or database.
+MacBook M1 Pro 16 GB: run selected Rust/Python services, DuckDB and local paper simulations only as needed; keep only required services running. Benchmark memory and swap and do not co-host full LLM training. Colab 200 CU/month: initial planning envelope 40 CU baseline, 80 CU candidate SFT, 40 CU eval/rollouts, 20 CU ablation, 20 CU reserve; **planning only**, update with observed CU/hour. Colab is disposable, not a persistent daemon or database.
+
+## Storage and agent harness handoffs
+
+See [data ownership](data-lake.md), [runtime architecture](architecture.md), and [P-class/CLI transition contract](contracts/pclass-cli-domain-state-machines.md). PostgreSQL owns operational account state, Parquet/DuckDB owns historical analytics, DuckLake is optional when snapshot/concurrent metadata needs are observed. A saved Soodles prompt is not proof of consumer behavior; only its selected native agent observation and Schema Manager feedback can support an Agent behavior claim.
 
 ## Outcome ledger
 
